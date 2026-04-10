@@ -21,12 +21,6 @@ const PATH = [
 ];
 
 const pathSet = new Set(PATH.map(([x, y]) => `${x},${y}`));
-const neighbors = [
-  [1, 0],
-  [-1, 0],
-  [0, 1],
-  [0, -1],
-];
 
 const state = {
   baseHp: 20,
@@ -260,7 +254,6 @@ function showGameOverIfNeeded() {
 
 function render() {
   renderHud();
-  renderTowers();
   renderEnemies();
   showGameOverIfNeeded();
 }
