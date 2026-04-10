@@ -28,11 +28,9 @@ const state = {
   wave: 1,
   towers: new Map(),
   enemies: [],
-  damagePopups: [],
   selectedTowerId: null,
   nextTowerId: 1,
   nextEnemyId: 1,
-  nextPopupId: 1,
 };
 
 const boardEl = document.getElementById("board");
@@ -90,7 +88,6 @@ function renderTowers() {
     if (!cell) return;
     const towerEl = document.createElement("button");
     towerEl.className = "tower";
-    towerEl.dataset.id = tower.id;
     if (tower.id === state.selectedTowerId) towerEl.classList.add("selected");
     towerEl.textContent = `L${tower.level}`;
     towerEl.title = `Level ${tower.level}`;
@@ -107,22 +104,8 @@ function renderEnemies() {
     if (!cell) return;
     const enemyEl = document.createElement("div");
     enemyEl.className = "enemy";
-    if (enemy.hitMs > 0) enemyEl.classList.add("hit");
     enemyEl.textContent = `E${enemy.hp}`;
     cell.appendChild(enemyEl);
-  });
-}
-
-function renderDamagePopups() {
-  document.querySelectorAll(".damage-popup").forEach((el) => el.remove());
-  state.damagePopups.forEach((popup) => {
-    const [x, y] = PATH[popup.pathIndex];
-    const cell = findCellByKey(key(x, y));
-    if (!cell) return;
-    const popupEl = document.createElement("div");
-    popupEl.className = "damage-popup";
-    popupEl.textContent = `-${popup.amount}`;
-    cell.appendChild(popupEl);
   });
 }
 
@@ -185,7 +168,6 @@ function spawnEnemy() {
     id: state.nextEnemyId,
     pathIndex: 0,
     hp,
-    hitMs: 0,
     moveTimerMs: 0,
     moveRateMs: 900,
   });
@@ -202,11 +184,7 @@ function dealTowerDamage(deltaMs) {
     const target = chooseTargetForTower(tower);
     if (!target) return;
 
-    const damage = towerDamageForLevel(tower.level);
-    target.hp -= damage;
-    target.hitMs = 160;
-    pulseTower(tower.id);
-    spawnDamagePopup(target.pathIndex, damage);
+    target.hp -= towerDamageForLevel(tower.level);
     tower.cooldownMs = Math.max(250, 900 - tower.level * 90);
   });
 
@@ -216,35 +194,6 @@ function dealTowerDamage(deltaMs) {
   if (killed > 0) {
     state.gold += killed * 4;
   }
-}
-
-function pulseTower(towerId) {
-  const towerEl = document.querySelector(`.tower[data-id='${towerId}']`);
-  if (!towerEl) return;
-  towerEl.classList.remove("shooting");
-  void towerEl.offsetWidth;
-  towerEl.classList.add("shooting");
-}
-
-function spawnDamagePopup(pathIndex, amount) {
-  state.damagePopups.push({
-    id: state.nextPopupId,
-    pathIndex,
-    amount,
-    ttlMs: 420,
-  });
-  state.nextPopupId += 1;
-}
-
-function updateEffectTimers(deltaMs) {
-  state.enemies.forEach((enemy) => {
-    enemy.hitMs = Math.max(0, enemy.hitMs - deltaMs);
-  });
-
-  state.damagePopups.forEach((popup) => {
-    popup.ttlMs -= deltaMs;
-  });
-  state.damagePopups = state.damagePopups.filter((popup) => popup.ttlMs > 0);
 }
 
 function chooseTargetForTower(tower) {
@@ -307,7 +256,6 @@ function showGameOverIfNeeded() {
 function render() {
   renderHud();
   renderEnemies();
-  renderDamagePopups();
   showGameOverIfNeeded();
 }
 
@@ -320,7 +268,6 @@ function tick(ts) {
     updateWave(delta);
     moveEnemies(delta);
     dealTowerDamage(delta);
-    updateEffectTimers(delta);
   }
 
   render();
