@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <title>Merge Tower Defense Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="hud">
+        <div class="hud-item">❤️ Base: <span id="baseHp">20</span></div>
+        <div class="hud-item">💰 Gold: <span id="gold">30</span></div>
+        <div class="hud-item">🌊 Wave: <span id="wave">1</span></div>
+      </header>
+
+      <section class="board-wrap">
+        <div id="board" class="board" aria-label="Tower defense board"></div>
+      </section>
+
+      <section class="controls">
+        <button id="summonBtn" class="summon">Summon Unit (10)</button>
+        <p class="tip">Tap a unit, then another of same level to merge.</p>
+      </section>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
