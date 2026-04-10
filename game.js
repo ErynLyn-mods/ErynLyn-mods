@@ -157,6 +157,7 @@ function summonTower() {
     cooldownMs: 0,
   });
   state.nextTowerId += 1;
+  renderTowers();
   render();
 }
 
